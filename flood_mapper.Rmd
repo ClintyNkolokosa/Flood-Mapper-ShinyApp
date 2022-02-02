@@ -70,10 +70,7 @@ damage_assessment_col <- function(data){
   })
 }
 
-damage_col <- function(data){
-  colorFactor(palette = c("red", "orange", "yellow"),
-                          domain = data$damage_gra)
-}
+
 
 # import data sourced from Copernicus Emergency Management Service
 flooded_area_chikwawa <- st_read("data/EMSR561_AOI01_DEL_PRODUCT_observedEventA_r1_v1.shp")
@@ -81,6 +78,11 @@ flooded_area_chikwawa <- st_read("data/EMSR561_AOI01_DEL_PRODUCT_observedEventA_
 wetland_chikwawa <- st_read("data/EMSR561_AOI01_DEL_PRODUCT_hydrographyA_r1_v1.shp")
 
 settlement_chikwawa <- st_read("data/EMSR561_AOI01_DEL_PRODUCT_builtUpA_r1_v1.shp")
+
+settlement_damage_chikwawa <- st_read("data/EMSR561_AOI01_GRA_PRODUCT_builtUpA_r1_v1.shp")
+
+chikwawa_damage_col <- colorFactor(palette = c("red", "orange", "yellow"),
+                                   domain = settlement_damage_chikwawa$damage_gra)
 
 rivers_chikwawa <- st_read("data/EMSR561_AOI01_DEL_PRODUCT_hydrographyL_r1_v1.shp")
 
@@ -99,8 +101,8 @@ settlement_bangula <- st_read("data/EMSR561_AOI02_DEL_PRODUCT_builtUpA_r1_v1.shp
 
 settlement_damage_bangula <- st_read("data/EMSR561_AOI02_GRA_PRODUCT_builtUpA_r1_v1.shp")
 
-#damage_col <- colorFactor(palette = c("red", "orange", "yellow"),
-                          #domain = settlement_damage_bangula$damage_gra)
+damage_col <- colorFactor(palette = c("red", "orange", "yellow"),
+                          domain = settlement_damage_bangula$damage_gra)
 
 rivers_bangula <- st_read("data/EMSR561_AOI02_DEL_PRODUCT_hydrographyL_r1_v1.shp")
 
@@ -189,6 +191,14 @@ renderLeaflet({
                  fillOpacity = 0.5,
                  fillColor = settlement_col,
                  group = "Settlement") |> 
+      addPolygons(data = settlement_damage_chikwawa,
+                  color = ~chikwawa_damage_col(damage_gra),
+                  smoothFactor = 0.1,
+                  stroke = 0.1,
+                  opacity = 0.1,
+                  fillOpacity = 0.6,
+                  fillColor =~chikwawa_damage_col(damage_gra),
+                  group = "Damage") |> 
       addPolygons(data = wetland_chikwawa,
                   stroke = 0.5,
                   smoothFactor = 0.2,
@@ -220,7 +230,7 @@ renderLeaflet({
                         "font-weight" = "bold", "color" = " #581845"),
                       textsize = "15px", direction = "auto"))|> 
       addLayersControl(
-        overlayGroups = c("Post flood", "Pre flood"),
+        overlayGroups = c("Post flood", "Pre flood", "Damage"),
         baseGroups = c("Esri.WorldImagery", "Thunderforest.OpenCycleMap"),
         options = layersControlOptions(collapsed = FALSE)) |> 
   addMiniMap(position = "bottomleft", tiles = (providers$CartoDB.Positron),
@@ -232,7 +242,7 @@ renderLeaflet({
       withProgress(message = 'Chonde dikirani...',
                     value = 1/5,{
       leaflet() |> 
-      setView(lng = 35.09670, lat = -16.56998, zoom = 12) |>                 
+      setView(lng = 35.09670, lat = -16.56998, zoom = 12) |> # map centered on Bangula and zoomed in a bit                
       addProviderTiles(providers$Thunderforest.OpenCycleMap,
                        options = providerTileOptions(apikey = Sys.getenv("APIKEY")),
                        group = "Thunderforest.OpenCycleMap") |> 
@@ -260,12 +270,12 @@ renderLeaflet({
                  fillColor = settlement_col,
                  group = "Settlement") |> 
       addPolygons(data = settlement_damage_bangula,
-                  color = ~damage_col(settlement_damage_bangula),
+                  color = ~damage_col(damage_gra),
                   smoothFactor = 0.1,
                   stroke = 0.1,
                   opacity = 0.1,
                   fillOpacity = 0.6,
-                  fillColor =~damage_col(settlement_damage_bangula),
+                  fillColor =~damage_col(damage_gra),
                   group = "Damage") |> 
       addPolygons(data = wetland_bangula,
                   stroke = 0.5,
