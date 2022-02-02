@@ -70,6 +70,10 @@ damage_assessment_col <- function(data){
   })
 }
 
+damage_col <- function(data){
+  colorFactor(palette = c("red", "orange", "yellow"),
+                          domain = data$damage_gra)
+}
 
 # import data sourced from Copernicus Emergency Management Service
 flooded_area_chikwawa <- st_read("data/EMSR561_AOI01_DEL_PRODUCT_observedEventA_r1_v1.shp")
@@ -95,7 +99,7 @@ settlement_bangula <- st_read("data/EMSR561_AOI02_DEL_PRODUCT_builtUpA_r1_v1.shp
 
 settlement_damage_bangula <- st_read("data/EMSR561_AOI02_GRA_PRODUCT_builtUpA_r1_v1.shp")
 
-damage_col <- colorFactor(palette = c("red", "orange", "yellow"),
+#damage_col <- colorFactor(palette = c("red", "orange", "yellow"),
                           domain = settlement_damage_bangula$damage_gra)
 
 rivers_bangula <- st_read("data/EMSR561_AOI02_DEL_PRODUCT_hydrographyL_r1_v1.shp")
