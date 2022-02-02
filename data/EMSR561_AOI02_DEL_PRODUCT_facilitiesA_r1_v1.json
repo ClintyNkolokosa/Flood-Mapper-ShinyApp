@@ -1,0 +1,11 @@
+{
+"type": "FeatureCollection",
+"features": [
+{ "type": "Feature", "properties": { "obj_type": "24-Other Civil Engineering Works", "name": "Chirimba Primary School ground", "info": "2411-Sports grounds", "det_method": "Not Applicable", "notation": "Not Applicable", "or_src_id": 994, "dmg_src_id": 997, "cd_value": "Not Applicable" }, "geometry": { "type": "Polygon", "coordinates": [ [ [ 35.147668, -16.616185 ], [ 35.147290, -16.616696 ], [ 35.147046, -16.616531 ], [ 35.147423, -16.616019 ], [ 35.147668, -16.616185 ] ] ] } }
+,
+{ "type": "Feature", "properties": { "obj_type": "24-Other Civil Engineering Works", "name": "Unknown", "info": "2412-Other sport and recreation constructions", "det_method": "Not Applicable", "notation": "Not Applicable", "or_src_id": 994, "dmg_src_id": 997, "cd_value": "Not Applicable" }, "geometry": { "type": "Polygon", "coordinates": [ [ [ 35.178015, -16.635559 ], [ 35.177886, -16.635876 ], [ 35.177567, -16.635748 ], [ 35.177702, -16.635447 ], [ 35.178015, -16.635559 ] ] ] } }
+,
+{ "type": "Feature", "properties": { "obj_type": "24-Other Civil Engineering Works", "name": "Bangula", "info": "2412-Other sport and recreation constructions", "det_method": "Not Applicable", "notation": "Not Applicable", "or_src_id": 994, "dmg_src_id": 997, "cd_value": "Not Applicable" }, "geometry": { "type": "Polygon", "coordinates": [ [ [ 35.118499, -16.583290 ], [ 35.117648, -16.583580 ], [ 35.115167, -16.576685 ], [ 35.115110, -16.576657 ], [ 35.114852, -16.575956 ], [ 35.114767, -16.575739 ], [ 35.114739, -16.575653 ], [ 35.114554, -16.575481 ], [ 35.114528, -16.575431 ], [ 35.114459, -16.575287 ], [ 35.114349, -16.575065 ], [ 35.114094, -16.574107 ], [ 35.114972, -16.573805 ], [ 35.115198, -16.574414 ], [ 35.115214, -16.574456 ], [ 35.118499, -16.583290 ] ] ] } }
+
+]
+}

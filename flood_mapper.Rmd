@@ -1,0 +1,392 @@
+---
+title: "Flood Situation in Southern Malawi"
+date: "`r Sys.Date()`"
+output:
+  flexdashboard::flex_dashboard:
+    orientation: columns
+    source_code: embed
+    vertical_layout: fill
+runtime: shiny
+resource_files:
+- Flood Mapping.Rproj
+- flood mapping.R
+- .Rhistory
+- .Renviron
+---
+
+```{r global, echo =FALSE, include=FALSE}
+# install required packages
+if(!require(leaflet)) install.packages("leaflet", repos = "http://cran.us.r-project.org")
+if(!require(shiny)) install.packages("shiny", repos = "http://cran.us.r-project.org")
+if(!require(tidyverse)) install.packages("tidyverse", repos = "http://cran.us.r-project.org")
+if(!require(leaflet)) install.packages("leaflet", repos = "http://cran.us.r-project.org")
+if(!require(leafsync)) install.packages("leafsync", repos = "http://cran.us.r-project.org")
+if(!require(leaflet.extras)) install.packages("leaflet.extras", repos = "http://cran.us.r-project.org")
+if(!require(shinyWidgets)) install.packages("shinyWidgets", repos = "http://cran.us.r-project.org")
+if(!require(shinydashboard)) install.packages("shinydashboard", repos = "http://cran.us.r-project.org")
+if(!require(shinythemes)) install.packages("shinythemes", repos = "http://cran.us.r-project.org")
+if(!require(geojsonio)) install.packages("geojsonio", repos = "http://cran.us.r-project.org")
+if(!require(RColorBrewer)) install.packages("RColorBrewer", repos = "http://cran.us.r-project.org")
+if(!require(sf)) install.packages("sf", repos = "http://cran.us.r-project.org")
+if(!require(flexdashboard)) install.packages("flexdashboard", repos = "http://cran.us.r-project.org")
+if(!require(shinyjs)) install.packages("shinyjs", repos = "http://cran.us.r-project.org")
+
+dirname <-  '~/R/Flood mapper'
+if (!dir.exists(dirname))dir.create(dirname,recursive=TRUE)
+
+# load installed libraries
+library(flexdashboard)
+library(shiny)
+library(shinythemes)
+library(shinydashboard)
+library(shinyWidgets)
+library(leaflet)
+library(leaflet.extras)
+library(leafsync)
+library(sf)
+library(tidyverse)
+library(RColorBrewer)
+library(shinyjs)
+
+# identify home directory
+normalizePath("~/")
+
+# set mapping colour for layers
+flood_col <- "#0084A8" # blue
+wetland_col <- "#002673" # dark blue
+settlement_col <- "#4C0073" # purple
+river_col <- "#64e3fc" # aqua blue 
+cropland_col <- "#70A800" # green
+
+damage_assessment_col <- function(data){
+  sapply(data$damage_gra, function(damage_gra){
+    if(damage_gra == "Damaged"){
+      "red"
+    } else if(damage_gra == "Possibly damaged"){
+      "orange"
+    } else{
+      "yellow"
+    }
+  })
+}
+
+
+# import data sourced from Copernicus Emergency Management Service
+flooded_area_chikwawa <- st_read("data/EMSR561_AOI01_DEL_PRODUCT_observedEventA_r1_v1.shp")
+
+wetland_chikwawa <- st_read("data/EMSR561_AOI01_DEL_PRODUCT_hydrographyA_r1_v1.shp")
+
+settlement_chikwawa <- st_read("data/EMSR561_AOI01_DEL_PRODUCT_builtUpA_r1_v1.shp")
+
+rivers_chikwawa <- st_read("data/EMSR561_AOI01_DEL_PRODUCT_hydrographyL_r1_v1.shp")
+
+poi_chikwawa <- st_read("data/Chikwawa_places.shp") |> 
+  st_cast("POINT") # convert multipoint geometry to point 
+
+aoi_chikwawa <- st_read("data/EMSR561_AOI01_DEL_PRODUCT_areaOfInterestA_r1_v1.shp")
+
+cropland_chikwawa <- st_read("data/cropland_chikwawa.shp")
+
+flooded_area_bangula <- st_read("data/EMSR561_AOI02_DEL_PRODUCT_observedEventA_r1_v1.shp")
+
+wetland_bangula <- st_read("data/EMSR561_AOI02_DEL_PRODUCT_hydrographyA_r1_v1.shp")
+
+settlement_bangula <- st_read("data/EMSR561_AOI02_DEL_PRODUCT_builtUpA_r1_v1.shp")
+
+settlement_damage_bangula <- st_read("data/EMSR561_AOI02_GRA_PRODUCT_builtUpA_r1_v1.shp")
+
+damage_col <- colorFactor(palette = c("red", "orange", "yellow"),
+                          domain = settlement_damage_bangula$damage_gra)
+
+rivers_bangula <- st_read("data/EMSR561_AOI02_DEL_PRODUCT_hydrographyL_r1_v1.shp")
+
+poi_bangula <- st_read("data/Bangula_places.shp")|> 
+  st_cast("POINT")
+
+aoi_bangula <- st_read("data/EMSR561_AOI02_DEL_PRODUCT_areaOfInterestA_r1_v1.shp") 
+
+cropland_bangula <- st_read("data/cropland Bangula.shp")
+
+flooded_area_nsanje <- st_read("data/EMSR561_AOI03_DEL_PRODUCT_observedEventA_r1_v1.shp")
+
+wetland_nsanje <- st_read("data/EMSR561_AOI03_DEL_PRODUCT_hydrographyA_r1_v1.shp")
+
+settlement_nsanje <- st_read("data/Nsanje residential areas.shp")
+
+built_up_nsanje <- st_read("data/EMSR561_AOI03_DEL_PRODUCT_builtUpA_r1_v1.shp")
+
+rivers_nsanje <- st_read("data/EMSR561_AOI03_DEL_PRODUCT_hydrographyL_r1_v1.shp")
+
+aoi_nsanje <- st_read("data/EMSR561_AOI03_DEL_PRODUCT_areaOfInterestA_r1_v1.shp")
+
+```
+
+## Sidebar {.sidebar}
+
+#### Select flooded area to display
+
+```{r}
+# # create a vector of flooded areas to choose from
+# flooded_area_choices <- c("Chikwawa", "Bangula", "Nsanje")
+# 
+# # create a drop down menu of flooded area
+# selectInput("flooded_area_choice", label = "Display map of floods in:",
+#             choices = flooded_area_choices, selected = flooded_area_choices[[1]])
+
+pickerInput("flooded_areas", label = "Display map of floods in:",
+            choices = list("Chikwawa", "Bangula", "Nsanje"))
+
+tags$img(src = "legend.png", height = 80, width = 200)
+
+```
+
+
+
+##### This dashboard has been prepared to report the riverine flood situation in southern Malawi after the passage of tropical storm Ana on 25 January 2022.
+
+##### The maps shows before and after the flood event and are based on based on the Copernicus Emergency Management Service -Mapping. The flood delineation layer has been derived from post-event satellite images (captured on 26/01/2022 and 29/01/2022) using a semi-automatic approach. Details about the tropical storm Ana can be found here: [Africa CDC](https://africacdc.org/news-item/tropical-storm-ana-hits-hard-five-countries-in-the-southern-africa-region/).
+
+##### [Clinton Nkolokosa](https://github.com/ClintyNkolokosa)
+
+## Column {data-width=400}
+### **Flood situation**. Please allow a few moments for the maps to appear 
+```{r}
+
+
+
+renderLeaflet({
+
+  if(input$flooded_areas == "Chikwawa"){
+    return(
+  # create flood extent map
+     leaflet() |> 
+      setView(lng = 34.82414, lat = -16.04908, zoom = 12) |> 
+      addProviderTiles(providers$Thunderforest.OpenCycleMap,
+                       options = providerTileOptions(apikey = Sys.getenv("APIKEY")),
+                       group = "Thunderforest.OpenCycleMap") |> 
+      addProviderTiles(providers$Esri.WorldImagery,
+                       group = "Esri.WorldImagery") |> 
+      addPolylines(data = rivers_chikwawa,
+                   weight = 1,
+                   smoothFactor = 0.1,
+                   color = river_col,
+                   opacity = 0.5,
+                   group = "River") |> 
+     addPolygons(data = cropland_chikwawa,
+                 stroke = FALSE,
+                 smoothFactor = 0.2,
+                 fillOpacity = 0.2,
+                 fillColor = cropland_col,
+                 group = "Cropland") |> 
+     addPolygons(data = settlement_chikwawa,
+                 stroke = 1,
+                 weight = 1,
+                 opacity = 0.5,
+                 color = "#4C0073",
+                 smoothFactor = 0.2,
+                 fillOpacity = 0.5,
+                 fillColor = settlement_col,
+                 group = "Settlement") |> 
+      addPolygons(data = wetland_chikwawa,
+                  stroke = 0.5,
+                  smoothFactor = 0.2,
+                  weight = 1,
+                  color = wetland_col,
+                  fillOpacity = 0.5,
+                  group = "Pre flood") |>
+     addPolygons(data = flooded_area_chikwawa,
+                 stroke = FALSE,
+                 smoothFactor = 0.2,
+                 fillOpacity = 0.5,
+                 fillColor = flood_col,
+                 group = "Post flood") |> 
+     addPolygons(data = aoi_chikwawa,
+                 stroke = 1,
+                 weight = 1.5,
+                 smoothFactor = 0.2,
+                 color = "#A80000",
+                 fillOpacity = 0,
+                 group = "Area of interest") |> 
+     addCircleMarkers(data = poi_chikwawa,
+                      color = "#FFC300",
+                      radius = 3,
+                      stroke = TRUE,
+                      fillOpacity = 0.7,
+                      label = poi_chikwawa$name,
+                      labelOptions = labelOptions(
+                      style = list(
+                        "font-weight" = "bold", "color" = " #581845"),
+                      textsize = "15px", direction = "auto"))|> 
+      addLayersControl(
+        overlayGroups = c("Post flood", "Pre flood"),
+        baseGroups = c("Esri.WorldImagery", "Thunderforest.OpenCycleMap"),
+        options = layersControlOptions(collapsed = FALSE)) |> 
+  addMiniMap(position = "bottomleft", tiles = (providers$CartoDB.Positron),
+             width = 120, height = 120, collapsedWidth = 10, collapsedHeight =10,
+             zoomLevelOffset = -6, zoomAnimation = TRUE))
+  }
+  else if(input$flooded_areas == "Bangula"){
+    return(
+      withProgress(message = 'Chonde dikirani...',
+                    value = 1/5,{
+      leaflet() |> 
+      setView(lng = 35.09670, lat = -16.56998, zoom = 12) |>                 
+      addProviderTiles(providers$Thunderforest.OpenCycleMap,
+                       options = providerTileOptions(apikey = Sys.getenv("APIKEY")),
+                       group = "Thunderforest.OpenCycleMap") |> 
+      addProviderTiles(providers$Esri.WorldImagery,
+                       group = "Esri.WorldImagery") |> 
+      addPolylines(data = rivers_bangula,
+                   weight = 1,
+                   smoothFactor = 0.1,
+                   color = river_col,
+                   opacity = 0.5,
+                   group = "River") |> 
+     addPolygons(data = cropland_bangula,
+                 stroke = FALSE,
+                 smoothFactor = 0.2,
+                 fillOpacity = 0.2,
+                 fillColor = cropland_col,
+                 group = "Cropland") |> 
+     addPolygons(data = settlement_bangula,
+                 stroke = 1,
+                 weight = 1,
+                 opacity = 0.5,
+                 color = "#4C0073",
+                 smoothFactor = 0.2,
+                 fillOpacity = 0.5,
+                 fillColor = settlement_col,
+                 group = "Settlement") |> 
+      addPolygons(data = settlement_damage_bangula,
+                  color = ~damage_col(damage_gra),
+                  smoothFactor = 0.1,
+                  stroke = 0.1,
+                  opacity = 0.1,
+                  fillOpacity = 0.6,
+                  fillColor =~damage_col(damage_gra),
+                  group = "Damage") |> 
+      addPolygons(data = wetland_bangula,
+                  stroke = 0.5,
+                  smoothFactor = 0.2,
+                  weight = 1,
+                  color = wetland_col,
+                  fillOpacity = 0.5,
+                  group = "Pre flood") |>
+     addPolygons(data = flooded_area_bangula,
+                 stroke = FALSE,
+                 smoothFactor = 0.2,
+                 fillOpacity = 0.5,
+                 fillColor = flood_col,
+                 group = "Post flood") |> 
+     addPolygons(data = aoi_bangula,
+                 stroke = 1,
+                 weight = 1.5,
+                 smoothFactor = 0.2,
+                 color = "#A80000",
+                 fillOpacity = 0,
+                 group = "Area of interest") |> 
+     addCircleMarkers(data = poi_bangula,
+                      color = "#FFBF00",
+                      radius = 3,
+                      stroke = TRUE,
+                      fillOpacity = 0.7,
+                      label = poi_bangula$name,
+                      labelOptions = labelOptions(
+                      style = list(
+                        "font-weight" = "bold", "color" = "#581845"),
+                      textsize = "15px", direction = "auto"))|> 
+      addLayersControl(
+        overlayGroups = c("Post flood", "Pre flood", "Damage"),
+        baseGroups = c("Esri.WorldImagery", "Thunderforest.OpenCycleMap"),
+        options = layersControlOptions(collapsed = FALSE)) |> 
+  addMiniMap(position = "bottomleft", tiles = (providers$CartoDB.Positron),
+             width = 120, height = 120, collapsedWidth = 10, collapsedHeight =10,
+             zoomLevelOffset = -6, zoomAnimation = TRUE)}) #|> 
+    #addLegend("topright", opacity = 1)
+    )}
+  else{
+    return(
+       withProgress(message = 'Chonde dikirani...',
+                    value = 1/5,{
+      leaflet() |> 
+      setView(lng = 35.23918, lat = -16.95804, zoom = 12) |>                            
+      addProviderTiles(providers$Thunderforest.OpenCycleMap,
+                       options = providerTileOptions(apikey = Sys.getenv("APIKEY")),
+                       group = "Thunderforest.OpenCycleMap") |> 
+      addProviderTiles(providers$Esri.WorldImagery,
+                       group = "Esri.WorldImagery") |> 
+      addPolylines(data = rivers_nsanje,
+                   weight = 1,
+                   smoothFactor = 0.1,
+                   color = river_col,
+                   opacity = 0.5,
+                   group = "River") |> 
+     addPolygons(data = built_up_nsanje,
+                 stroke = 0.3,
+                 weight = 0.5,
+                 color = "#4C0073",
+                 smoothFactor = 5,
+                 fillOpacity = 0.5,
+                 fillColor = settlement_col,
+                 group = "Built up area") |> 
+     addPolygons(data = settlement_nsanje,
+                 stroke = 1,
+                 weight = 1,
+                 opacity = 0.5,
+                 color = "#4C0073",
+                 smoothFactor = 0.2,
+                 fillOpacity = 0.5,
+                 fillColor = settlement_col,
+                 group = "Settlement") |> 
+      addPolygons(data = wetland_nsanje,
+                  stroke = 0.5,
+                  smoothFactor = 0.2,
+                  weight = 1,
+                  color = wetland_col,
+                  fillOpacity = 0.5,
+                  group = "Pre flood") |>
+     addPolygons(data = flooded_area_nsanje,
+                 stroke = FALSE,
+                 smoothFactor = 0.2,
+                 fillOpacity = 0.5,
+                 fillColor = flood_col,
+                 group = "Post flood") |> 
+     addPolygons(data = aoi_nsanje,
+                 stroke = 1,
+                 weight = 1.5,
+                 smoothFactor = 0.2,
+                 color = "#A80000",
+                 fillOpacity = 0,
+                 group = "Area of interest")|> 
+      addLayersControl(
+        overlayGroups = c("Post flood", "Pre flood"),
+        baseGroups = c("Esri.WorldImagery", "Thunderforest.OpenCycleMap"),
+        options = layersControlOptions(collapsed = FALSE)) |> 
+  addMiniMap(position = "bottomleft", tiles = (providers$CartoDB.Positron),
+             width = 120, height = 120, collapsedWidth = 10, collapsedHeight =10,
+             zoomLevelOffset = -6, zoomAnimation = TRUE)})
+    )
+  }
+    
+
+})
+
+ reactive_flood_extent <- reactive({
+    if (input$flooded_areas == "Chikwawa") {
+      29.7
+    } else if (input$flooded_areas == "Bangula"){
+      33.7
+    } else{
+      62.4
+    }
+  })
+  
+  reactive_flooded_area <- renderText({
+    paste0("Total flooded area: ", reactive_flood_extent()[[1]], "sq.km")
+  })
+
+   textOutput("reactive_flooded_area")
+
+```
+
+

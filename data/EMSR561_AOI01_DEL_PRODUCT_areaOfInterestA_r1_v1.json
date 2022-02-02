@@ -1,0 +1,7 @@
+{
+"type": "FeatureCollection",
+"features": [
+{ "type": "Feature", "properties": { "emsr_id": "EMSR561", "glide_no": "Not Applicable", "area_id": "01", "locality": "Chikwawa", "map_type": "Delineation" }, "geometry": { "type": "Polygon", "coordinates": [ [ [ 34.929663, -16.101444 ], [ 34.855558, -16.176974 ], [ 34.700937, -15.978175 ], [ 34.780742, -15.919747 ], [ 34.929663, -16.101444 ] ] ] } }
+
+]
+}
