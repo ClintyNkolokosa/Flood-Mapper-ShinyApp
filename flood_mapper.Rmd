@@ -51,7 +51,7 @@ library(shinyjs)
 # identify home directory
 normalizePath("~/")
 
-# set mapping colour for layers
+# set mapping colour for layers to ensure consistency
 flood_col <- "#0084A8" # blue
 wetland_col <- "#002673" # dark blue
 settlement_col <- "#4C0073" # purple
@@ -77,8 +77,6 @@ poi_icon <- awesomeIcons(icon = "home",
                          markerColor = "white",
                          squareMarker = TRUE)
 
-transparent_icon <- makeIcon(iconUrl = "https://www.iconsdb.com/icons/preview/purple/home-7-xxl.png",
-                             iconWidth = 100, iconHeight = 100)
 
 # import data sourced from Copernicus Emergency Management Service
 flooded_area_chikwawa <- st_read("data/EMSR561_AOI01_DEL_PRODUCT_observedEventA_r1_v1.shp")
@@ -225,12 +223,15 @@ renderLeaflet({
                  color = "#A80000",
                  fillOpacity = 0,
                  group = "Area of interest") |> 
-     addMarkers(data = poi_chikwawa,
-                icon = transparent_icon,
-                label = poi_chikwawa$name,
-                labelOptions = labelOptions(
-                  style = list("font-weight" = "bold", "color" = " #581845"),
-                textsize = "15px", direction = "auto"))|> 
+     addCircleMarkers(data = poi_chikwawa,
+                      weight = 1,
+                      radius = 5,
+                      fillOpacity = 0.4,
+                      color = "#4d004b",
+                      label = poi_chikwawa$name,
+                      labelOptions = labelOptions(
+                         style = list("font-weight" = "bold", "color" = " #581845"),
+                      textsize = "15px", direction = "auto"))|> 
       addLayersControl(
         overlayGroups = c("Post flood", "Pre flood", "Damage"),
         baseGroups = c("Esri.WorldImagery", "Thunderforest.OpenCycleMap"),
@@ -299,12 +300,16 @@ renderLeaflet({
                  color = "#A80000",
                  fillOpacity = 0,
                  group = "Area of interest") |> 
-     addMarkers(data = poi_bangula,
-                icon = transparent_icon,
-                label = poi_bangula$name,
-                labelOptions = labelOptions(
-                  style = list("font-weight" = "bold", "color" = "#581845"),
-                textsize = "15px", direction = "auto"))|> 
+     addCircleMarkers(data = poi_bangula,
+                      weight = 1,
+                      radius = 5,
+                      fillOpacity = 0.4,
+                      color = "#4d004b",
+                      label = poi_bangula$name,
+                      labelOptions = labelOptions(
+                         style = list("font-weight" = "bold", "color" = "#581845"),
+                      textsize = "15px", direction = "auto"),
+                      group = "Village")|> 
       addLayersControl(
         overlayGroups = c("Post flood", "Pre flood", "Damage"),
         baseGroups = c("Esri.WorldImagery", "Thunderforest.OpenCycleMap"),
