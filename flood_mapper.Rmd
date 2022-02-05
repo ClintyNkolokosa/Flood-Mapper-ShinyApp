@@ -174,10 +174,11 @@ tags$img(src = "legend.png", height = 80, width = 200)
 
 renderLeaflet({
   
-  map_title <- tags$style(HTML(".map-title{
-                               transform:translate(-10%, 20%);
+  map_title <- tags$style(HTML(".leaflet-control.map-title{
+                               transform:translate(-20%, 20%);
                                position: fixed!important;
-                               top = 90;
+                               top: 90;
+                               left: 25%;
                                text-align: left;
                                padding-left: 20px;
                                padding-right: 10px;
@@ -227,6 +228,7 @@ renderLeaflet({
                   opacity = 0.5,
                   fillOpacity = 0.6,
                   fillColor = ~chikwawa_damage_col(damage_gra),
+                  label = lapply(settlement_damage_chikwawa$damage_gra, HTML),
                   group = "Damage") |> 
       addPolygons(data = wetland_chikwawa,
                   stroke = FALSE,
@@ -240,6 +242,7 @@ renderLeaflet({
                  smoothFactor = 0.2,
                  fillOpacity = 0.5,
                  fillColor = flood_col,
+                 label = lapply(flooded_area_chikwawa$notation, HTML),
                  group = "Post flood") |> 
      addPolygons(data = aoi_chikwawa,
                  weight = 1.5,
@@ -305,6 +308,7 @@ renderLeaflet({
                   opacity = 0.5,
                   fillOpacity = 0.6,
                   fillColor =~damage_col(damage_gra),
+                  label = lapply(settlement_damage_bangula$damage_gra, HTML),
                   group = "Damage") |> 
       addPolygons(data = wetland_bangula,
                   stroke = FALSE,
@@ -318,6 +322,7 @@ renderLeaflet({
                  smoothFactor = 0.2,
                  fillOpacity = 0.5,
                  fillColor = flood_col,
+                 label = lapply(flooded_area_bangula$notation, HTML),
                  group = "Post flood") |> 
      addPolygons(data = aoi_bangula,
                  stroke = 1,
@@ -408,7 +413,8 @@ renderLeaflet({
         options = layersControlOptions(collapsed = FALSE)) |> 
       addMiniMap(position = "bottomleft", tiles = (providers$CartoDB.Positron),
                  width = 120, height = 120, collapsedWidth = 10, collapsedHeight =10,
-                 zoomLevelOffset = -6, zoomAnimation = TRUE)})#|> 
+                 zoomLevelOffset = -6, zoomAnimation = TRUE)})|>  
+      addControl(leafletitle, position = "topleft", className = "map-title")#|> 
       #addResetMapButton()
     )
   } 
@@ -432,6 +438,7 @@ renderLeaflet({
                   weight = 0.7,
                   fill = TRUE,
                   fillOpacity = 0.1,
+                  label = lapply(southern_region$DISTRICT, HTML),
                   popup = ~southern_region$DISTRICT,
                   # add hover effect
                   highlightOptions = highlightOptions(
@@ -455,19 +462,22 @@ renderLeaflet({
         options = layersControlOptions(collapsed = FALSE)) |> 
      addMiniMap(position = "bottomleft", tiles = (providers$CartoDB.Positron),
                 width = 120, height = 120, collapsedWidth = 10, collapsedHeight =10,
-                zoomLevelOffset = -6, zoomAnimation = TRUE)})#|> 
+                zoomLevelOffset = -6, zoomAnimation = TRUE)}) |>  
+      addControl(leafletitle, position = "topleft", className = "map-title")#|> 
       #addResetMapButton()
     )}
 
 })
 
  reactive_flood_extent <- reactive({
-    if (input$flooded_areas == "Chikwawa") {
-      29.7
+    if (input$flooded_areas == "Southern region") {
+      580
     } else if (input$flooded_areas == "Bangula"){
       33.7
-    } else{
+    } else if(input$flooded_areas == "Nsanje"){
       62.4
+    } else{
+      return(29.7)
     }
   })
   
