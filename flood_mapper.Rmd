@@ -399,10 +399,10 @@ renderLeaflet({
                        group = "Esri.WorldImagery") |>
       addPolygons(data = flood_extent_southernMw,
                   stroke = FALSE,
-                 smoothFactor = 0.2,
-                 fillOpacity = 0.5,
-                 fillColor = flood_col,
-                 group = "Flood extent") |> 
+                  smoothFactor = 0.2,
+                  fillOpacity = 0.7,
+                  fillColor = flood_col,
+                  group = "Flood extent") |> 
       addLayersControl(
         overlayGroups = ("Flood extent"),
         baseGroups = c("Esri.WorldImagery", "Thunderforest.OpenCycleMap"),
