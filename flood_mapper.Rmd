@@ -131,6 +131,9 @@ rivers_nsanje <- st_read("data/EMSR561_AOI03_DEL_PRODUCT_hydrographyL_r1_v1.shp"
 
 aoi_nsanje <- st_read("data/EMSR561_AOI03_DEL_PRODUCT_areaOfInterestA_r1_v1.shp")
 
+# import data sourced from United Nations Institute for Training and Research (unitar)
+flood_extent_southernMw <- st_read("data/flood_extent_southernMw.gpkg")
+
 ```
 
 ## Sidebar {.sidebar}
@@ -146,7 +149,7 @@ aoi_nsanje <- st_read("data/EMSR561_AOI03_DEL_PRODUCT_areaOfInterestA_r1_v1.shp"
 #             choices = flooded_area_choices, selected = flooded_area_choices[[1]])
 
 pickerInput("flooded_areas", label = "Display map of floods in:",
-            choices = list("Chikwawa", "Bangula", "Nsanje"))
+            choices = list("Chikwawa", "Bangula", "Nsanje", "Southern region"))
 
 tags$img(src = "legend.png", height = 80, width = 200)
 
@@ -319,7 +322,7 @@ renderLeaflet({
              zoomLevelOffset = -6, zoomAnimation = TRUE)}) |> 
       addResetMapButton()
     )}
-  else{
+  else if (input$flooded_areas == "Nsanje"){
     return(
        withProgress(message = 'Chonde dikirani...',
                     value = 1/5,{
@@ -382,8 +385,33 @@ renderLeaflet({
              zoomLevelOffset = -6, zoomAnimation = TRUE)})|> 
       addResetMapButton()
     )
-  }
-    
+  } 
+  else {
+    return(
+       withProgress(message = 'Chonde dikirani...',
+                    value = 1/5,{
+      leaflet() |> 
+      setView(lng = 35.0814, lat = -15.5211, zoom = 8) |>                            
+      addProviderTiles(providers$Thunderforest.OpenCycleMap,
+                       options = providerTileOptions(apikey = Sys.getenv("APIKEY")),
+                       group = "Thunderforest.OpenCycleMap") |> 
+      addProviderTiles(providers$Esri.WorldImagery,
+                       group = "Esri.WorldImagery") |>
+      addPolygons(data = flood_extent_southernMw,
+                  stroke = FALSE,
+                 smoothFactor = 0.2,
+                 fillOpacity = 0.5,
+                 fillColor = flood_col,
+                 group = "Flood extent") |> 
+      addLayersControl(
+        overlayGroups = ("Flood extent"),
+        baseGroups = c("Esri.WorldImagery", "Thunderforest.OpenCycleMap"),
+        options = layersControlOptions(collapsed = FALSE)) |> 
+  addMiniMap(position = "bottomleft", tiles = (providers$CartoDB.Positron),
+             width = 120, height = 120, collapsedWidth = 10, collapsedHeight =10,
+             zoomLevelOffset = -6, zoomAnimation = TRUE)})|> 
+      addResetMapButton()
+    )}
 
 })
 
