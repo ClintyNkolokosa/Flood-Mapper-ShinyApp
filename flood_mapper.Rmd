@@ -134,6 +134,11 @@ aoi_nsanje <- st_read("data/EMSR561_AOI03_DEL_PRODUCT_areaOfInterestA_r1_v1.shp"
 # import data sourced from United Nations Institute for Training and Research (unitar)
 flood_extent_southernMw <- st_read("data/flood_extent_southernMw.gpkg")
 
+# import southern region administration boundary
+southern_region <- st_read("data/southern_region_admn_bnd.gpkg")
+
+
+
 ```
 
 ## Sidebar {.sidebar}
@@ -391,20 +396,38 @@ renderLeaflet({
        withProgress(message = 'Chonde dikirani...',
                     value = 1/5,{
       leaflet() |> 
-      setView(lng = 35.0814, lat = -15.5211, zoom = 8) |>                            
+      setView(lng = 35.0554, lat = -15.8417, zoom = 8) |>                            
       addProviderTiles(providers$Thunderforest.OpenCycleMap,
                        options = providerTileOptions(apikey = Sys.getenv("APIKEY")),
                        group = "Thunderforest.OpenCycleMap") |> 
       addProviderTiles(providers$Esri.WorldImagery,
                        group = "Esri.WorldImagery") |>
+      addPolygons(data = southern_region,
+                  stroke = 1,
+                  color = "red",
+                  opacity = 0.5,
+                  weight = 0.7,
+                  fill = TRUE,
+                  fillOpacity = 0.1,
+                  popup = ~southern_region$DISTRICT,
+                  # add hover effect
+                  highlightOptions = highlightOptions(
+                    color = "#E2068A",
+                    weight = 1.5,
+                    bringToFront = TRUE,
+                    fillOpacity = 0.5),
+                  group = "Southern region") |> 
       addPolygons(data = flood_extent_southernMw,
-                  stroke = FALSE,
+                  stroke = 0.7,
+                  weight = 0.8,
+                  opacity = 0.5,
+                  color = flood_col,
                   smoothFactor = 0.2,
-                  fillOpacity = 0.7,
+                  fillOpacity = 0.8,
                   fillColor = flood_col,
                   group = "Flood extent") |> 
       addLayersControl(
-        overlayGroups = ("Flood extent"),
+        overlayGroups = c("Flood extent", "Southern region"),
         baseGroups = c("Esri.WorldImagery", "Thunderforest.OpenCycleMap"),
         options = layersControlOptions(collapsed = FALSE)) |> 
   addMiniMap(position = "bottomleft", tiles = (providers$CartoDB.Positron),
