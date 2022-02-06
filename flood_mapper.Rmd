@@ -16,6 +16,7 @@ resource_files:
 
 ```{r global, echo =FALSE, include=FALSE}
 # install required packages
+if(!require(devtools)) install.packages("devtools", repos = "http://cran.rstudio.com")
 if(!require(leaflet)) install.packages("leaflet", repos = "http://cran.rstudio.com")
 if(!require(shiny)) install.packages("shiny", repos = "http://cran.rstudio.com")
 if(!require(tidyverse)) install.packages("tidyverse", repos = "http://cran.rstudio.com")
@@ -31,12 +32,14 @@ if(!require(sf)) install.packages("sf", repos = "http://cran.rstudio.com")
 if(!require(flexdashboard)) install.packages("flexdashboard", repos = "http://cran.rstudio.com")
 if(!require(shinyjs)) install.packages("shinyjs", repos = "http://cran.rstudio.com")
 if(!require(htmltools)) install.packages("htmltools", repos = "http://cran.rstudio.com")
+if(!require(Rcpp)) install.packages("Rcpp",repos = "http://cran.rstudio.com")
+if(!require(terra)) devtools::install_version("terra", "1.5-17")
 if(!require(raster)) install.packages("raster", repos = c("http://rstudio.org/_packages",
-"http://cran.rstudio.com",dependencies=TRUE))
-if(!require(rgdal)) install.packages("rgdal", repos = "http://cran.rstudio.com")
+"http://cran.rstudio.com"), dependencies = TRUE)
+if(!require(rgdal)) install.packages("rgdal",repos = "http://cran.rstudio.com")
 
 dirname <-  '~/R/Flood mapper'
-if (!dir.exists(dirname))dir.create(dirname,recursive=TRUE)
+if(!dir.exists(dirname))dir.create(dirname,recursive=TRUE)
 
 # load installed libraries
 library(flexdashboard)
@@ -150,6 +153,8 @@ mw_pop_2020 <- raster::raster("data/mwi_ppp_2020_UNadj.tif")
 
 mw_pop_2020_clip <- raster::crop(mw_pop_2020, extent(as(southern_region, "Spatial"))) |> 
   raster::mask(as(southern_region, "Spatial"))
+pop_col <- colorQuantile("RdYlGn", values(mw_pop_2020_clip), n = 4, 
+                         reverse = TRUE, na.color = "transparent")
 
 affected_pop_estimates <- function(pop_raster, flood_extent){
   # extract population values
@@ -473,7 +478,7 @@ renderLeaflet({
                      colors = pop_col,
                      opacity = 0.6,
                      group = "Population") |> 
-                         addPolygons(data = southern_region,
+      addPolygons(data = southern_region,
                   stroke = 1,
                   color = "white",
                   opacity = 0.5,
