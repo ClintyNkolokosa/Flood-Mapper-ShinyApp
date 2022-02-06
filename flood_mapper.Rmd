@@ -149,10 +149,17 @@ flood_extent_southernMw <- st_read("data/flood_extent_southernMw.gpkg")
 southern_region <- st_read("data/southern_region_admn_bnd.gpkg")
 
 # import WorldPop population estimates data
-mw_pop_2020 <- raster::raster("data/mwi_ppp_2020_UNadj.tif")
+#mw_pop_2020 <- raster::raster("data/mwi_ppp_2020_UNadj.tif")
 
-mw_pop_2020_clip <- raster::crop(mw_pop_2020, extent(as(southern_region, "Spatial"))) |> 
-  raster::mask(as(southern_region, "Spatial"))
+#mw_pop_2020_clip <- raster::crop(mw_pop_2020, extent(as(southern_region, "Spatial"))) |> 
+#  raster::mask(as(southern_region, "Spatial"))
+#writeRaster(mw_pop_2020_clip, "data/mw_pop_2020_clip.tif")
+
+mw_pop_2020_clip <- raster("data/mw_pop_2020_clip.tif")
+
+#mw_pop_2020_downsized <- aggregate(mw_pop_2020_clip, fact = 20, 
+#                                   fun = mean, expand = TRUE)
+
 pop_col <- colorQuantile("RdYlGn", values(mw_pop_2020_clip), n = 4, 
                          reverse = TRUE, na.color = "transparent")
 
@@ -498,13 +505,18 @@ renderLeaflet({
         overlayGroups = c("Flood extent", "Southern region", "Population"),
         baseGroups = c("Esri.WorldImagery", "Thunderforest.OpenCycleMap"),
         options = layersControlOptions(collapsed = FALSE)) |> 
-      addLegend(values = 1:1500,
-                pal = colorQuantile("RdYlGn", 1:1500, reverse = TRUE),
+      addLegend(values = 1:1300000,
+                pal = colorQuantile("RdYlGn", 1:1300000, reverse = TRUE),
                 title = "Estimated population",
                 labFormat = function(type, cuts, p){
                   n = length(cuts)
                   p = paste0(round(p*100), '%')
-                  cuts = paste0(formatC(cuts[-n]), " - ", formatC(cuts[-1]))
+                  cuts = paste0(prettyNum(cuts[-n],
+                                          big.mark=",",
+                                          decimal.mark = getOption("OutDec")), 
+                                " - ", prettyNum(cuts[-1],
+                                                 big.mark=",",
+                                                 decimal.mark = getOption("OutDec")))
                   paste0('<span title ="', p[-n], " - ", p[-1], '">', cuts,'</span>')
                 },
                 opacity = 0.8) |> 
