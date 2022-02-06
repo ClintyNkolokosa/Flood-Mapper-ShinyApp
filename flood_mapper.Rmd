@@ -16,21 +16,24 @@ resource_files:
 
 ```{r global, echo =FALSE, include=FALSE}
 # install required packages
-if(!require(leaflet)) install.packages("leaflet", repos = "http://cran.us.r-project.org")
-if(!require(shiny)) install.packages("shiny", repos = "http://cran.us.r-project.org")
-if(!require(tidyverse)) install.packages("tidyverse", repos = "http://cran.us.r-project.org")
-if(!require(leaflet)) install.packages("leaflet", repos = "http://cran.us.r-project.org")
-if(!require(leafsync)) install.packages("leafsync", repos = "http://cran.us.r-project.org")
-if(!require(leaflet.extras)) install.packages("leaflet.extras", repos = "http://cran.us.r-project.org")
-if(!require(shinyWidgets)) install.packages("shinyWidgets", repos = "http://cran.us.r-project.org")
-if(!require(shinydashboard)) install.packages("shinydashboard", repos = "http://cran.us.r-project.org")
-if(!require(shinythemes)) install.packages("shinythemes", repos = "http://cran.us.r-project.org")
-if(!require(geojsonio)) install.packages("geojsonio", repos = "http://cran.us.r-project.org")
-if(!require(RColorBrewer)) install.packages("RColorBrewer", repos = "http://cran.us.r-project.org")
-if(!require(sf)) install.packages("sf", repos = "http://cran.us.r-project.org")
-if(!require(flexdashboard)) install.packages("flexdashboard", repos = "http://cran.us.r-project.org")
-if(!require(shinyjs)) install.packages("shinyjs", repos = "http://cran.us.r-project.org")
-if(!require(htmltools)) install.packages("htmltools", repos = "http://cran.us.r-project.org")
+if(!require(leaflet)) install.packages("leaflet", repos = "http://cran.rstudio.com")
+if(!require(shiny)) install.packages("shiny", repos = "http://cran.rstudio.com")
+if(!require(tidyverse)) install.packages("tidyverse", repos = "http://cran.rstudio.com")
+if(!require(leaflet)) install.packages("leaflet", repos = "http://cran.rstudio.com")
+if(!require(leafsync)) install.packages("leafsync", repos = "http://cran.rstudio.com")
+if(!require(leaflet.extras)) install.packages("leaflet.extras", repos = "http://cran.rstudio.com")
+if(!require(shinyWidgets)) install.packages("shinyWidgets", repos = "http://cran.rstudio.com")
+if(!require(shinydashboard)) install.packages("shinydashboard", repos = "http://cran.rstudio.com")
+if(!require(shinythemes)) install.packages("shinythemes", repos = "http://cran.rstudio.com")
+if(!require(geojsonio)) install.packages("geojsonio", repos = "http://cran.rstudio.com")
+if(!require(RColorBrewer)) install.packages("RColorBrewer", repos = "http://cran.rstudio.com")
+if(!require(sf)) install.packages("sf", repos = "http://cran.rstudio.com")
+if(!require(flexdashboard)) install.packages("flexdashboard", repos = "http://cran.rstudio.com")
+if(!require(shinyjs)) install.packages("shinyjs", repos = "http://cran.rstudio.com")
+if(!require(htmltools)) install.packages("htmltools", repos = "http://cran.rstudio.com")
+if(!require(terra)) install.packages('terra', repos='https://rspatial.r-universe.dev')
+if(!require(raster)) install.packages("raster", repos = c("http://rstudio.org/_packages",
+"http://cran.rstudio.com",dependencies=TRUE))
 
 dirname <-  '~/R/Flood mapper'
 if (!dir.exists(dirname))dir.create(dirname,recursive=TRUE)
@@ -49,6 +52,7 @@ library(tidyverse)
 library(RColorBrewer)
 library(shinyjs)
 library(htmltools)
+library(raster)
 
 # identify home directory
 normalizePath("~/")
@@ -139,7 +143,8 @@ flood_extent_southernMw <- st_read("data/flood_extent_southernMw.gpkg")
 # import southern region administration boundary
 southern_region <- st_read("data/southern_region_admn_bnd.gpkg")
 
-
+# import WorldPop population estimates data
+mw_pop_2020 <- raster::raster("data/mwi_ppp_2020")
 
 ```
 
