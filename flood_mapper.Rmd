@@ -34,6 +34,7 @@ if(!require(htmltools)) install.packages("htmltools", repos = "http://cran.rstud
 if(!require(terra)) install.packages('terra', repos='https://rspatial.r-universe.dev')
 if(!require(raster)) install.packages("raster", repos = c("http://rstudio.org/_packages",
 "http://cran.rstudio.com",dependencies=TRUE))
+if(!require(rgdal)) install.packages("rgdal", repos = "http://cran.rstudio.com")
 
 dirname <-  '~/R/Flood mapper'
 if (!dir.exists(dirname))dir.create(dirname,recursive=TRUE)
@@ -53,6 +54,7 @@ library(RColorBrewer)
 library(shinyjs)
 library(htmltools)
 library(raster)
+library(rgdal)
 
 # identify home directory
 normalizePath("~/")
@@ -63,6 +65,7 @@ wetland_col <- "#002673" # dark blue
 settlement_col <- "#4C0073" # purple
 river_col <- "#64e3fc" # aqua blue 
 cropland_col <- "#70A800" # green
+
 
 damage_assessment_col <- function(data){
   sapply(data$damage_gra, function(damage_gra){
@@ -144,7 +147,30 @@ flood_extent_southernMw <- st_read("data/flood_extent_southernMw.gpkg")
 southern_region <- st_read("data/southern_region_admn_bnd.gpkg")
 
 # import WorldPop population estimates data
-mw_pop_2020 <- raster::raster("data/mwi_ppp_2020")
+mw_pop_2020 <- raster::raster("data/mwi_ppp_2020.tif")
+
+mw_pop_2020_clip <- raster::crop(mw_pop_2020, extent(as(southern_region, "Spatial"))) |> 
+  raster::mask(as(southern_region, "Spatial"))
+
+affected_pop_estimates <- function(pop_raster, flood_extent){
+  # extract population values
+  affected_pop <- round(raster::extract(pop_raster, flood_extent, 
+                                        fun= sum, na.rm = TRUE))
+  
+  affected_pop_df <- affected_pop %>%
+    lapply(unlist) %>%
+    lapply(as_tibble) %>%
+    bind_rows(., .id = "rowID") %>%
+    dplyr::rename(pop = value)
+  
+  flood_extent$rowID <- 1:nrow(flood_extent)
+  
+  affected_pop_estimates <- merge(flood_extent, affected_pop_df, by = "rowID")
+}
+
+# uncomment these lines if running for the first time. 
+#affected_pop_southern <- affected_pop_estimates(mw_pop_2020_clip, flood_extent_southernMw) NB: this may take a while...
+#total_pop_affected <- sum(affected_pop_southern$pop) # ~108,674 people
 
 ```
 
@@ -436,11 +462,24 @@ renderLeaflet({
                        group = "Thunderforest.OpenCycleMap") |> 
       addProviderTiles(providers$Esri.WorldImagery,
                        group = "Esri.WorldImagery") |>
-      addPolygons(data = southern_region,
-                  stroke = 1,
-                  color = "red",
+      addPolygons(data = flood_extent_southernMw,
+                  stroke = 0.7,
+                  weight = 0.8,
                   opacity = 0.5,
-                  weight = 0.7,
+                  color = flood_col,
+                  smoothFactor = 0.2,
+                  fillOpacity = 0.8,
+                  fillColor = flood_col,
+                  group = "Flood extent") |> 
+      addRasterImage(mw_pop_2020_clip,
+                     colors = pop_col,
+                     opacity = 0.6,
+                     group = "Population") |> 
+                         addPolygons(data = southern_region,
+                  stroke = 1,
+                  color = "white",
+                  opacity = 0.5,
+                  weight = 0.8,
                   fill = TRUE,
                   fillOpacity = 0.1,
                   label = lapply(southern_region$DISTRICT, HTML),
@@ -452,19 +491,20 @@ renderLeaflet({
                     bringToFront = TRUE,
                     fillOpacity = 0.5),
                   group = "Southern region") |> 
-      addPolygons(data = flood_extent_southernMw,
-                  stroke = 0.7,
-                  weight = 0.8,
-                  opacity = 0.5,
-                  color = flood_col,
-                  smoothFactor = 0.2,
-                  fillOpacity = 0.8,
-                  fillColor = flood_col,
-                  group = "Flood extent") |> 
       addLayersControl(
-        overlayGroups = c("Flood extent", "Southern region"),
+        overlayGroups = c("Flood extent", "Southern region", "Population"),
         baseGroups = c("Esri.WorldImagery", "Thunderforest.OpenCycleMap"),
         options = layersControlOptions(collapsed = FALSE)) |> 
+      addLegend(values = 1:1500,
+                pal = colorQuantile("RdYlGn", 1:1500, reverse = TRUE),
+                title = "Estimated population",
+                labFormat = function(type, cuts, p){
+                  n = length(cuts)
+                  p = paste0(round(p*100), '%')
+                  cuts = paste0(formatC(cuts[-n]), " - ", formatC(cuts[-1]))
+                  paste0('<span title ="', p[-n], " - ", p[-1], '">', cuts,'</span>')
+                },
+                opacity = 0.8) |> 
      addMiniMap(position = "bottomleft", tiles = (providers$CartoDB.Positron),
                 width = 120, height = 120, collapsedWidth = 10, collapsedHeight =10,
                 zoomLevelOffset = -6, zoomAnimation = TRUE)}) |>  
