@@ -146,7 +146,7 @@ flood_extent_southernMw <- st_read("data/flood_extent_southernMw.gpkg")
 southern_region <- st_read("data/southern_region_admn_bnd.gpkg")
 
 # import WorldPop population estimates data
-mw_pop_2020 <- raster::raster("data/mwi_ppp_2020.tif")
+mw_pop_2020 <- raster::raster("data/mwi_ppp_2020_UNadj.tif")
 
 mw_pop_2020_clip <- raster::crop(mw_pop_2020, extent(as(southern_region, "Spatial"))) |> 
   raster::mask(as(southern_region, "Spatial"))
