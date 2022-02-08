@@ -213,7 +213,7 @@ tags$img(src = "legend.png", height = 80, width = 200)
 ```
 
 
-##### This dashboard has been prepared to report the riverine flood situation in southern Malawi after the passage of tropical storm Ana on 25 January 2022. The maps shows before and after the flood event and are based on based on the [Copernicus Emergency Management Service](https://emergency.copernicus.eu/mapping/list-of-components/EMSR561) and United Nations Institute for Training and Research. The flood delineation layer has been derived from post-event satellite images (captured on 26/01/2022 and 02/02/2022) using a semi-automatic approach. Details about the tropical storm Ana can be found here: [Africa CDC](https://africacdc.org/news-item/tropical-storm-ana-hits-hard-five-countries-in-the-southern-africa-region/).
+##### This dashboard has been prepared to report the riverine flood situation in southern Malawi after the passage of tropical storm Ana on 25 January 2022. The maps shows before and after the flood event and are based on based on the [Copernicus Emergency Management Service](https://emergency.copernicus.eu/mapping/list-of-components/EMSR561) and [United Nations Institute for Training and Research](https://www.unitar.org/maps/map/3457). The flood delineation layer has been derived from post-event satellite images (captured on 26/01/2022 and 02/02/2022) using a semi-automatic approach. Details about the tropical storm Ana can be found here: [Africa CDC](https://africacdc.org/news-item/tropical-storm-ana-hits-hard-five-countries-in-the-southern-africa-region/).
 
 ##### [Clinton Nkolokosa](https://github.com/ClintyNkolokosa/Flood-Mapper-ShinyApp)
 
