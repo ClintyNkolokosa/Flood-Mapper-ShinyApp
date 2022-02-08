@@ -37,6 +37,7 @@ if(!require(terra)) devtools::install_version("terra", "1.5-17")
 if(!require(raster)) install.packages("raster", repos = c("http://rstudio.org/_packages",
 "http://cran.rstudio.com"), dependencies = TRUE)
 if(!require(rgdal)) install.packages("rgdal",repos = "http://cran.rstudio.com")
+if(!require(rmapshaper)) install.packages("rmapshaper")
 
 dirname <-  '~/R/Flood mapper'
 if(!dir.exists(dirname))dir.create(dirname,recursive=TRUE)
@@ -56,7 +57,8 @@ library(RColorBrewer)
 library(shinyjs)
 library(htmltools)
 library(raster)
-library(rgdal)
+library(rgdal)x
+library(rmapshaper)
 
 # identify home directory
 normalizePath("~/")
@@ -136,7 +138,8 @@ wetland_nsanje <- st_read("data/EMSR561_AOI03_DEL_PRODUCT_hydrographyA_r1_v1.shp
 
 settlement_nsanje <- st_read("data/Nsanje residential areas.shp")
 
-built_up_nsanje <- st_read("data/EMSR561_AOI03_DEL_PRODUCT_builtUpA_r1_v1.shp")
+built_up_nsanje <- st_read("data/EMSR561_AOI03_DEL_PRODUCT_builtUpA_r1_v1.shp")|> 
+  rmapshaper::ms_simplify(keep_shapes = TRUE) # shapefile is large; it needs simplifying
 
 rivers_nsanje <- st_read("data/EMSR561_AOI03_DEL_PRODUCT_hydrographyL_r1_v1.shp")
 
@@ -511,12 +514,7 @@ renderLeaflet({
                 labFormat = function(type, cuts, p){
                   n = length(cuts)
                   p = paste0(round(p*100), '%')
-                  cuts = paste0(prettyNum(cuts[-n],
-                                          big.mark=",",
-                                          decimal.mark = getOption("OutDec")), 
-                                " - ", prettyNum(cuts[-1],
-                                                 big.mark=",",
-                                                 decimal.mark = getOption("OutDec")))
+                  cuts = paste0(prettyNum(cuts[-n]), " - ", prettyNum(cuts[-1]))
                   paste0('<span title ="', p[-n], " - ", p[-1], '">', cuts,'</span>')
                 },
                 opacity = 0.8) |> 
