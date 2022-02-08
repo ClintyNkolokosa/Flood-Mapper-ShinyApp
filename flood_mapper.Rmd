@@ -315,7 +315,12 @@ renderLeaflet({
       addMiniMap(position = "bottomleft", tiles = (providers$CartoDB.Positron),
                  width = 120, height = 120, collapsedWidth = 10, collapsedHeight =10,
                  zoomLevelOffset = -6, zoomAnimation = TRUE)) |>  
-      addControl(leafletitle, position = "topleft", className = "map-title")
+      addControl(leafletitle, position = "topleft", className = "map-title")|> 
+      addMeasure(primaryLengthUnit = "kilometers",
+                 primaryAreaUnit = "hectares",
+                 secondaryAreaUnit = "sqmeters",
+                 activeColor = "#ABE67E",
+                 position = "bottomright")
   }
   else if(input$flooded_areas == "Bangula"){
     return(
@@ -397,7 +402,12 @@ renderLeaflet({
       addMiniMap(position = "bottomleft", tiles = (providers$CartoDB.Positron),
                  width = 120, height = 120, collapsedWidth = 10, collapsedHeight =10,
                  zoomLevelOffset = -6, zoomAnimation = TRUE)}) |> 
-      addControl(leafletitle, position = "topleft", className = "map-title") #|> 
+      addControl(leafletitle, position = "topleft", className = "map-title")|> 
+      addMeasure(primaryLengthUnit = "kilometers",
+                 primaryAreaUnit = "hectares",
+                 secondaryAreaUnit = "sqmeters",
+                 activeColor = "#ABE67E",
+                 position = "bottomright") #|> 
       #addResetMapButton()
     )}
   else if (input$flooded_areas == "Nsanje"){
@@ -463,7 +473,12 @@ renderLeaflet({
       addMiniMap(position = "bottomleft", tiles = (providers$CartoDB.Positron),
                  width = 120, height = 120, collapsedWidth = 10, collapsedHeight =10,
                  zoomLevelOffset = -6, zoomAnimation = TRUE)})|>  
-      addControl(leafletitle, position = "topleft", className = "map-title")#|> 
+      addControl(leafletitle, position = "topleft", className = "map-title")|> 
+      addMeasure(primaryLengthUnit = "kilometers",
+                 primaryAreaUnit = "hectares",
+                 secondaryAreaUnit = "sqmeters",
+                 activeColor = "#ABE67E",
+                 position = "bottomright")#|> 
       #addResetMapButton()
     )
   } 
@@ -526,7 +541,12 @@ renderLeaflet({
      addMiniMap(position = "bottomleft", tiles = (providers$CartoDB.Positron),
                 width = 120, height = 120, collapsedWidth = 10, collapsedHeight =10,
                 zoomLevelOffset = -6, zoomAnimation = TRUE)}) |>  
-      addControl(leafletitle, position = "topleft", className = "map-title")#|> 
+      addControl(leafletitle, position = "topleft", className = "map-title") |> 
+      addMeasure(primaryLengthUnit = "kilometers",
+                 primaryAreaUnit = "hectares",
+                 secondaryAreaUnit = "sqmeters",
+                 activeColor = "#ABE67E",
+                 position = "bottomright")#|> 
       #addResetMapButton()
     )}
 
