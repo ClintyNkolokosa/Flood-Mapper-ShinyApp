@@ -190,6 +190,7 @@ affected_pop_estimates <- function(pop_raster, flood_extent){
 # uncomment these lines if running for the first time. 
 #affected_pop_southern <- affected_pop_estimates(mw_pop_2020_clip, flood_extent_southernMw) NB: this may take a while...
 #total_pop_affected <- sum(affected_pop_southern$pop) # ~108,674 people
+#st_write(affected_pop_southern, "data/estimated_pop_affected.shp")
 
 ```
 
