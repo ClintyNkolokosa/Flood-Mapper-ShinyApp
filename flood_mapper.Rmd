@@ -207,9 +207,9 @@ affected_pop_estimates <- function(pop_raster, flood_extent){
 #             choices = flooded_area_choices, selected = flooded_area_choices[[1]])
 
 pickerInput("flooded_areas", label = "Display map of floods in:",
-            choices = list("Chikwawa", "Bangula", "Nsanje", "Southern region"))
+            choices = list("Chikwawa", "Bangula", "Nsanje", "Southern district boundaries"))
 
-tags$img(src = "legend.png", height = 85, width = 200)
+tags$img(src = "legend.png", height = 100, width = 200)
 
 ```
 
