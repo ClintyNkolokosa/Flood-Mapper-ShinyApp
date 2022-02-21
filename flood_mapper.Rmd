@@ -168,8 +168,8 @@ mw_pop_2020_clip <- raster("data/mw_pop_2020_clip.tif")
 #mw_pop_2020_downsized <- aggregate(mw_pop_2020_clip, fact = 20, 
 #                                   fun = mean, expand = TRUE)
 
-pop_col <- colorQuantile("RdYlGn", values(mw_pop_2020_clip), n = 4, 
-                         reverse = TRUE, na.color = "transparent")
+pop_col <- colorQuantile("RdPu", values(mw_pop_2020_clip), n = 4, 
+                         reverse = FALSE, na.color = "transparent")
 
 affected_pop_estimates <- function(pop_raster, flood_extent){
   # extract population values
@@ -209,7 +209,7 @@ affected_pop_estimates <- function(pop_raster, flood_extent){
 pickerInput("flooded_areas", label = "Display map of floods in:",
             choices = list("Chikwawa", "Bangula", "Nsanje", "Southern district boundaries"))
 
-tags$img(src = "legend.png", height = 100, width = 200)
+tags$img(src = "legend.png", height = 100, width = 205)
 
 ```
 
@@ -534,7 +534,7 @@ renderLeaflet({
         baseGroups = c("Esri.WorldImagery", "Thunderforest.OpenCycleMap"),
         options = layersControlOptions(collapsed = FALSE)) |> 
       addLegend(values = 1:1300000,
-                pal = colorQuantile("RdYlGn", 1:1300000, reverse = TRUE),
+                pal = colorQuantile("RdPu", 1:1300000, reverse = FALSE),
                 title = "Estimated population",
                 labFormat = function(type, cuts, p){
                   n = length(cuts)
