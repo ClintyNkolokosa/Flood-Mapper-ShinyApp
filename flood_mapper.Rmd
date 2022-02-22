@@ -209,7 +209,7 @@ affected_pop_estimates <- function(pop_raster, flood_extent){
 pickerInput("flooded_areas", label = "Display map of floods in:",
             choices = list("Chikwawa", "Bangula", "Nsanje", "Southern district boundaries"))
 
-tags$img(src = "legend.png", height = 100, width = 205)
+tags$img(src = "legend.png", height = 108, width = 210)
 
 ```
 
@@ -511,7 +511,7 @@ renderLeaflet({
                   group = "Flood extent") |> 
       addRasterImage(mw_pop_2020_clip,
                      colors = pop_col,
-                     opacity = 0.6,
+                     opacity = 1,
                      group = "Population") |> 
       addPolygons(data = southern_region,
                   stroke = 1,
@@ -579,7 +579,7 @@ renderLeaflet({
    
    
     reactive_affected_people <- reactive({
-    if(input$flooded_areas == "Southern region") {
+    if(input$flooded_areas == "Southern district boundaries") {
       30500
     } else if(input$flooded_areas == "Bangula"){
       6291
