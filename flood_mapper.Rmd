@@ -73,7 +73,7 @@ normalizePath("~/")
 # set mapping colour for layers to ensure consistency
 # select purple green palette from the hcl series:
 # c4a_gui() # Shiny GUI for exploring colorblind friendly palettes
-purple_green <- c4a("hcl.purple_green", 4,
+purple_green <- c4a("hcl.purple_green", 3,
                     reverse = TRUE) # get a cols4all color palette
 purple_orange <- c4a("purp_or", 4, reverse = TRUE)
 flood_col <- "#0084A8" # blue
@@ -180,7 +180,7 @@ mw_pop_2020_clip <- raster("data/mw_pop_2020_clip.tif")
 #mw_pop_2020_downsized <- aggregate(mw_pop_2020_clip, fact = 20, 
 #                                   fun = mean, expand = TRUE)
 
-pop_col <- colorQuantile(purple_green, values(mw_pop_2020_clip), n = 4, 
+pop_col <- colorQuantile(purple_green, values(mw_pop_2020_clip), n = 3, 
                          reverse = FALSE, na.color = "transparent")
 
 affected_pop_estimates <- function(pop_raster, flood_extent){
