@@ -180,7 +180,7 @@ mw_pop_2020_clip <- raster("data/mw_pop_2020_clip.tif")
 #mw_pop_2020_downsized <- aggregate(mw_pop_2020_clip, fact = 20, 
 #                                   fun = mean, expand = TRUE)
 
-pop_col <- colorQuantile(purple_orange, values(mw_pop_2020_clip), n = 4, 
+pop_col <- colorQuantile(purple_green, values(mw_pop_2020_clip), n = 4, 
                          reverse = FALSE, na.color = "transparent")
 
 affected_pop_estimates <- function(pop_raster, flood_extent){
