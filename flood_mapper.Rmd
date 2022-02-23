@@ -560,7 +560,7 @@ renderLeaflet({
 })
 
  reactive_flood_extent <- reactive({
-    if(input$flooded_areas == "Southern region") {
+    if(input$flooded_areas == "Southern district boundaries") {
       580
     } else if(input$flooded_areas == "Bangula"){
       33.7
