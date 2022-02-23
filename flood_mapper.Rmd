@@ -546,7 +546,7 @@ renderLeaflet({
         baseGroups = c("Esri.WorldImagery", "Thunderforest.OpenCycleMap"),
         options = layersControlOptions(collapsed = FALSE)) |> 
       addLegend(values = 1:1300000,
-                pal = colorQuantile("RdPu", 1:1300000, reverse = FALSE),
+                pal = colorQuantile(purple_green, 1:1300000, reverse = FALSE),
                 title = "Estimated population",
                 labFormat = function(type, cuts, p){
                   n = length(cuts)
