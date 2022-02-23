@@ -70,7 +70,8 @@ normalizePath("~/")
 
 # set mapping colour for layers to ensure consistency
 # select purple green palette from the hcl series:
-purple_green <- c4a("hcl.purple_green", 4) # get a cols4all color palette
+purple_green <- c4a("hcl.purple_green", 4,
+                    reverse = TRUE) # get a cols4all color palette
 flood_col <- "#0084A8" # blue
 wetland_col <- "#002673" # dark blue
 settlement_col <- "#4C0073" # purple
