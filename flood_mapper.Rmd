@@ -38,6 +38,8 @@ if(!require(raster)) install.packages("raster", repos = c("http://rstudio.org/_p
 "http://cran.rstudio.com"), dependencies = TRUE)
 if(!require(rgdal)) install.packages("rgdal",repos = "http://cran.rstudio.com")
 if(!require(rmapshaper)) install.packages("rmapshaper")
+#devtools::install_github("mtennekes/cols4all")
+
 
 dirname <-  '~/R/Flood mapper'
 if(!dir.exists(dirname))dir.create(dirname,recursive=TRUE)
@@ -59,11 +61,16 @@ library(htmltools)
 library(raster)
 library(rgdal)
 library(rmapshaper)
+library(cols4all)
+library(abind)
+library(colorspace)
 
 # identify home directory
 normalizePath("~/")
 
 # set mapping colour for layers to ensure consistency
+# select purple green palette from the hcl series:
+purple_green <- c4a("hcl.purple_green", 4) # get a cols4all color palette
 flood_col <- "#0084A8" # blue
 wetland_col <- "#002673" # dark blue
 settlement_col <- "#4C0073" # purple
@@ -168,7 +175,7 @@ mw_pop_2020_clip <- raster("data/mw_pop_2020_clip.tif")
 #mw_pop_2020_downsized <- aggregate(mw_pop_2020_clip, fact = 20, 
 #                                   fun = mean, expand = TRUE)
 
-pop_col <- colorQuantile("RdPu", values(mw_pop_2020_clip), n = 4, 
+pop_col <- colorQuantile(purple_green, values(mw_pop_2020_clip), n = 4, 
                          reverse = FALSE, na.color = "transparent")
 
 affected_pop_estimates <- function(pop_raster, flood_extent){
